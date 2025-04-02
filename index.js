@@ -1,26 +1,24 @@
 import chalk from 'chalk' 
 import {showWeather} from "./getweather.js"
-import {checkCitiesValid} from "./validation.js"
-import {checkTempValid} from "./validation.js"
-import {checkLangValid} from "./validation.js"
+import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
+
+function getFlagArguments(flagStartSymbol) {
+    const resultFlagValue = []
+    for(let i = 0; i < args.length; i++) {
+        if(args[i] === flagStartSymbol) {
+            while(i + 1 < args.length && !args[i + 1].startsWith('-')) {
+                resultFlagValue.push(args[i + 1])
+                i++
+            }
+        }
+    }
+    return resultFlagValue
+}
 
 async function main() {
     const [,, ...args] = process.argv
     if(!args || !Array.isArray(args) || !args.length) return console.log('\nНе получили аргументы.')
     console.log(chalk.blue('\nПолученные аргументы:'), args)
-
-    function getFlagArguments(flagStartSymbol) {
-        const resultFlagValue = []
-        for(let i = 0; i < args.length; i++) {
-            if(args[i] === flagStartSymbol) {
-                while(i + 1 < args.length && !args[i + 1].startsWith('-')) {
-                    resultFlagValue.push(args[i + 1])
-                    i++
-                }
-            }
-        }
-        return resultFlagValue
-    }
 
     const cFlagValues = getFlagArguments('-c')
     console.log(chalk.cyan('Переданный список городов:'), cFlagValues)
@@ -30,14 +28,12 @@ async function main() {
     console.log(chalk.greenBright.italic('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'))
 
     const tFlagValue = getFlagArguments('-t')[0]
-    let tempOnlyStatus
-    tempOnlyStatus = checkTempValid(tFlagValue, tempOnlyStatus)
+    const tempOnlyStatus = checkTempValid(tFlagValue, tempOnlyStatus)
 
     console.log(chalk.greenBright.italic('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'))
 
     const lFlagValue = getFlagArguments('-l')[0]
-    let langStatus
-    langStatus = (checkLangValid(lFlagValue))
+    const langStatus = checkLangValid(lFlagValue)
 
     console.log(chalk.greenBright.italic(('\n<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->')))
 
