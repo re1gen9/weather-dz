@@ -4,11 +4,6 @@ import {checkCitiesValid} from "./validation.js"
 import {checkTempValid} from "./validation.js"
 import {checkLangValid} from "./validation.js"
 
-export const WEATHER_LANG_OPTION = {
-    RU: 'ru',
-    EN: 'en'
-}
-
 async function main() {
     const [,, ...args] = process.argv
     if(!args || !Array.isArray(args) || !args.length) return console.log('\nНе получили аргументы.')
@@ -42,7 +37,7 @@ async function main() {
 
     const lFlagValue = getFlagArguments('-l')[0]
     let langStatus
-    langStatus = (checkLangValid(lFlagValue, langStatus))
+    langStatus = (checkLangValid(lFlagValue))
 
     console.log(chalk.greenBright.italic(('\n<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->')))
 
@@ -69,5 +64,3 @@ async function main() {
 }
 
 main()
-
-console.log('AAAAAA')

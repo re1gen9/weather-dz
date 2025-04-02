@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import {WEATHER_LANG_OPTION} from "./index.js"
+import {WEATHER_LANG_OPTION} from "./config.js"
 
 export function checkCitiesValid(cFlagValuesRequest) {
     if(!cFlagValuesRequest.length) {
@@ -31,20 +31,18 @@ export function checkTempValid(tFlagValueRequest, tempOnlyStatusRequest) {
     }
 }
 
-export function checkLangValid(lFlagValueRequest, langStatusRequest) {
+export function checkLangValid(lFlagValueRequest) {
     if(!lFlagValueRequest) {
         console.log(chalk.yellow('Не было передано аргумента для параметра lang, значение автоматически выставлено на ') + chalk.green(`${WEATHER_LANG_OPTION.RU}`))
         console.log(chalk.green.bold(WEATHER_LANG_OPTION.RU))
         return (WEATHER_LANG_OPTION.RU)
     }
     console.log(chalk.yellow('Переданный аргумент для параметра lang:'), chalk.rgb(53, 0, 176)(lFlagValueRequest))
-    if(/^[a-zA-Z!]+$/.test(lFlagValueRequest) === false) {
-        console.log(chalk.yellow('Переданный аргумент для параметра language содержит в себе не только английские буквы, значение автоматически выставлено на ') + chalk.green(`${WEATHER_LANG_OPTION.RU}`))
+    if(!(Object.values(WEATHER_LANG_OPTION).includes(lFlagValueRequest))) {
+        console.log(chalk.yellow('Переданный аргумент для параметра language не является одним из доступных вариантов, значение автоматически выставлено на ') + chalk.green(`${WEATHER_LANG_OPTION.RU}`))
         console.log(chalk.green.bold(WEATHER_LANG_OPTION.RU))
         return (WEATHER_LANG_OPTION.RU)
-    } else {
-        console.log(chalk.green.bold(lFlagValueRequest))
-        return lFlagValueRequest
     }
-    console.log(chalk.green.bold(langStatusRequest))
+    console.log(chalk.green.bold(lFlagValueRequest))
+    return lFlagValueRequest
 }
