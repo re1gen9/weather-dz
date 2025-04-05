@@ -3,6 +3,9 @@
   "dependencies": {
     "axios": "^1.8.4",
     "chalk": "^5.4.1",
-    "openai": "^4.91.1"
+    "cli-table": "^0.3.11",
+    "openai": "^4.91.1",
+    "pretty-json": "^0.1.1",
+    "type": "module"  
   }
 }

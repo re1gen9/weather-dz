@@ -21,7 +21,7 @@ async function main() {
     getLogs([inputSectionLog, `\nПолученные аргументы:`], [commentsLog, `\n${args}`])
 
     const cFlagValues = getFlagArguments('-c', args)
-    getLogs([inputSectionLog, 'Переданный список городов:']) + getLogs([commentsLog, cFlagValues])
+    getLogs([inputSectionLog, 'Переданный список городов:']) + getLogs([commentsLog, cFlagValues], [(function zero(){}), 'Авапвапва'])
     checkCitiesValid(cFlagValues)
     const cities = cFlagValues
 

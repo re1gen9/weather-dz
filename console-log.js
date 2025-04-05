@@ -19,3 +19,10 @@ export const requestPropertyLog = chalk.rgb(149, 0, 255)
 export function getLogs(...logs) {
     console.log(logs.map(log => log[0](log[1])).join(' '))
 }
+
+export function getWeatherLogs(response, tempOnly) {
+    if(tempOnly === true) {
+        return console.log(response?.main?.temp)
+    }
+    return console.log(response)
+}
