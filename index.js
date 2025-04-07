@@ -1,45 +1,41 @@
-import chalk from 'chalk' 
 import {showWeather} from "./getweather.js"
-import {checkCitiesValid} from "./validation.js"
-import {checkTempValid} from "./validation.js"
-import {checkLangValid} from "./validation.js"
+import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
+import {falseLog, getLogs, titleSectionLog, inputSectionLog, commentsLog, requestKeyLog, requestPropertyLog} from "./console-log.js"
+
+function getFlagArguments(flagStartSymbol, inputArgs) {
+    const resultFlagValue = []
+    for(let i = 0; i < inputArgs.length; i++) {
+        if(inputArgs[i] === flagStartSymbol) {
+            while(i + 1 < inputArgs.length && !inputArgs[i + 1].startsWith('-')) {
+                resultFlagValue.push(inputArgs[i + 1])
+                i++
+            }
+        }
+    }
+    return resultFlagValue
+}
 
 async function main() {
     const [,, ...args] = process.argv
-    if(!args || !Array.isArray(args) || !args.length) return console.log('\nНе получили аргументы.')
-    console.log(chalk.blue('\nПолученные аргументы:'), args)
+    if(!args || !Array.isArray(args) || !args.length) return getLogs([commentsLog, '\nНе получили аргументы'])
+    getLogs([inputSectionLog, `\nПолученные аргументы:`], [commentsLog, `\n${args}`])
 
-    function getFlagArguments(flagStartSymbol) {
-        const resultFlagValue = []
-        for(let i = 0; i < args.length; i++) {
-            if(args[i] === flagStartSymbol) {
-                while(i + 1 < args.length && !args[i + 1].startsWith('-')) {
-                    resultFlagValue.push(args[i + 1])
-                    i++
-                }
-            }
-        }
-        return resultFlagValue
-    }
-
-    const cFlagValues = getFlagArguments('-c')
-    console.log(chalk.cyan('Переданный список городов:'), cFlagValues)
+    const cFlagValues = getFlagArguments('-c', args)
+    getLogs([inputSectionLog, 'Переданный список городов:']) + getLogs([commentsLog, cFlagValues])
     checkCitiesValid(cFlagValues)
     const cities = cFlagValues
 
-    console.log(chalk.greenBright.italic('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'))
+    getLogs([titleSectionLog, '\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'])
 
-    const tFlagValue = getFlagArguments('-t')[0]
-    let tempOnlyStatus
-    tempOnlyStatus = checkTempValid(tFlagValue, tempOnlyStatus)
+    const tFlagValue = getFlagArguments('-t', args)[0]
+    const tempOnlyStatus = checkTempValid(tFlagValue)
 
-    console.log(chalk.greenBright.italic('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'))
+    getLogs([titleSectionLog, '\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'])
 
-    const lFlagValue = getFlagArguments('-l')[0]
-    let langStatus
-    langStatus = (checkLangValid(lFlagValue))
+    const lFlagValue = getFlagArguments('-l', args)[0]
+    const langStatus = checkLangValid(lFlagValue)
 
-    console.log(chalk.greenBright.italic(('\n<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->')))
+    getLogs([titleSectionLog, '\n<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->'])
 
     for(const city of cities) {
         const cityData = {
@@ -47,18 +43,18 @@ async function main() {
             tempOnly: tempOnlyStatus,
             lang: langStatus
         }
-        console.log(chalk.blue.bold('\n< --- Отправляем запрос со следующими параметрами --- >\n'))
-        console.log(
-            chalk.rgb(255, 128, 73)('Город:'), chalk.rgb(255, 255, 255)(cityData.city) + '\n' +
-            chalk.rgb(255, 128, 73)('Значение для tempOnly:'), chalk.rgb(255, 255, 255)(cityData.tempOnly) + '\n' +
-            chalk.rgb(255, 128, 73)('Язык:'), chalk.rgb(255, 255, 255)(cityData.lang) + '\n'
-          )
+        getLogs([falseLog, '\n< --- Отправляем запрос со следующими параметрами --- >\n'])
+
+        getLogs([requestKeyLog, 'Город:'], [requestPropertyLog, `${cityData.city}`])
+        getLogs([requestKeyLog, 'Значение для tempOnly:'], [requestPropertyLog, `${cityData.tempOnly}`])
+        getLogs([requestKeyLog, 'Язык:'], [requestPropertyLog, `${cityData.lang}\n`])
+          
         try {
             await showWeather(cityData)
         } catch(error) {
-            console.log(chalk.red.bold('< --- Произошла ошибка, информация по городу не была найдена --- >\n'))
-            console.log(chalk.rgb(0, 255, 136)('Код ошибки: '), chalk.rgb(53, 0, 176)(error.response.data.cod))
-            console.log(chalk.rgb(0, 255, 136)('Полученное сообщение: '), chalk.rgb(53, 0, 176)(error.response.data.message))
+            getLogs([falseLog, '< --- Произошла ошибка, информация по городу не была найдена --- >\n'])
+            getLogs([requestKeyLog, 'Код ошибки:'], [falseLog, error.response.data.cod])
+            getLogs([requestKeyLog, 'Полученное сообщение:'], [requestPropertyLog, `${error.response.data.message}\n`])
         }
     }
 }

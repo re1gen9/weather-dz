@@ -3,6 +3,5 @@ export const WEATHER_API_APP_ID = '2096553889c62590a4aa404102d237a1'
 export const WEATHER_LANG_OPTION = {
     RU: 'ru',
     EN: 'en',
-    KZ: 'kz',
     DE: 'de'
 }

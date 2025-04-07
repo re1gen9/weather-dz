@@ -1,13 +1,9 @@
 import axios from "axios"
-import {WEATHER_API_URL, WEATHER_API_APP_ID} from "./config.js" 
+import {WEATHER_API_URL, WEATHER_API_APP_ID} from "./config.js"
+import {GetWeatherLogs} from "./console-log.js"
 
 export async function showWeather(dataForSearch) {
-    if(dataForSearch.tempOnly === true) {
-        const res = await getWeather(dataForSearch.city, dataForSearch.lang)
-        if(!res) return null
-        return console.log(res.main.temp)
-    } 
-    return getWeather(dataForSearch.city, dataForSearch.lang)
+    return GetWeatherLogs(getWeather, dataForSearch)
 }
 
 async function getWeather(city, lang) {
@@ -19,5 +15,5 @@ async function getWeather(city, lang) {
     }
     return axios.get(WEATHER_API_URL, {
         params
-      }).then((res) => console.log(res.data))
-}
+      }).then((res) => res.data)
+    }
