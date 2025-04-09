@@ -4,6 +4,7 @@ import {WEATHER_LANG_OPTION} from "./config.js"
 export function checkCitiesValid(cFlagValuesRequest) {
     if(!cFlagValuesRequest.length) {
         getLogs([commentsLog, 'Не было указано ни одного аргумента для списка городов, пожалуйста, впишите данные'])
+        // это мы еще обсудим
         process.kill(process.pid)
     } else if(/[0-9]/.test(cFlagValuesRequest)) {
         getLogs([commentsLog, 'В одном из аргументов для списка городов найдена цифра, пожалуйста, впишите валидные данные'])
@@ -12,6 +13,8 @@ export function checkCitiesValid(cFlagValuesRequest) {
 }
 
 export function checkTempValid(tFlagValueRequest) {
+    // из checkLangValid() мы всякое лишнее удалили. Надо сделать то же самое и здесь
+    // + по хорошему удобно плясать от "шлем значение по умолчанию, если только не вставить_текст"
     if (!tFlagValueRequest) {
         getLogs([commentsLog, 'Не было передано аргумента для параметра tempOnly, значение автоматически выставлено на'], [falseLog, false], [falseLog, `\nfalse`])
         return false

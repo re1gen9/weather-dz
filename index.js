@@ -18,11 +18,16 @@ function getFlagArguments(flagStartSymbol, inputArgs) {
 async function main() {
     const [,, ...args] = process.argv
     if(!args || !Array.isArray(args) || !args.length) return getLogs([commentsLog, '\nНе получили аргументы'])
+    // В чем отличие между этим
     getLogs([inputSectionLog, `\nПолученные аргументы:`], [commentsLog, `\n${args}`])
+    // И этим
+    console.log(inputSectionLog('Полученные аргументы:'), commentsLog(args))
+    // Ну или с переносами строк console.log(inputSectionLog('\nПолученные аргументы:'), commentsLog('\n',args))
 
     const cFlagValues = getFlagArguments('-c', args)
     getLogs([inputSectionLog, 'Переданный список городов:']) + getLogs([commentsLog, cFlagValues])
     checkCitiesValid(cFlagValues)
+    // зачем нужно это переприсвоение?
     const cities = cFlagValues
 
     getLogs([titleSectionLog, '\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'])
@@ -58,5 +63,19 @@ async function main() {
         }
     }
 }
+
+/**
+ * У тебя вылезают ненужные дублирующие логи
+ * 
+ * <---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->
+
+Переданный аргумент для параметра tempOnly: true
+true
+
+<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->
+
+Не было передано аргумента для параметра lang, значение автоматически выставлено на ru
+ru
+ */
 
 main()
