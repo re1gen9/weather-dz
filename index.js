@@ -1,6 +1,6 @@
 import {showWeather} from "./getweather.js"
 import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
-import {falseLog, getLogs, titleSectionLog, inputSectionLog, commentsLog, requestKeyLog, requestPropertyLog} from "./console-log.js"
+import {falseLog, getLogs, titleSectionLog, inputSectionLog, commentsLog, requestKeyLog, requestPropertyLog, printLogs} from "./console-log.js"
 
 function getFlagArguments(flagStartSymbol, inputArgs) {
     const resultFlagValue = []
@@ -18,16 +18,15 @@ function getFlagArguments(flagStartSymbol, inputArgs) {
 async function main() {
     const [,, ...args] = process.argv
     if(!args || !Array.isArray(args) || !args.length) return getLogs([commentsLog, '\nНе получили аргументы'])
-    // В чем отличие между этим
     getLogs([inputSectionLog, `\nПолученные аргументы:`], [commentsLog, `\n${args}`])
-    // И этим
-    console.log(inputSectionLog('Полученные аргументы:'), commentsLog(args))
-    // Ну или с переносами строк console.log(inputSectionLog('\nПолученные аргументы:'), commentsLog('\n',args))
+    // Поменять все getLogs на printLogs
+    printLogs(inputSectionLog('Полученные аргументы:'), commentsLog(args))
 
     const cFlagValues = getFlagArguments('-c', args)
     getLogs([inputSectionLog, 'Переданный список городов:']) + getLogs([commentsLog, cFlagValues])
     checkCitiesValid(cFlagValues)
     // зачем нужно это переприсвоение?
+    // пусть checkCitiesValid возвращает провалидированный список городов для cities
     const cities = cFlagValues
 
     getLogs([titleSectionLog, '\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'])

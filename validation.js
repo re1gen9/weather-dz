@@ -5,31 +5,38 @@ export function checkCitiesValid(cFlagValuesRequest) {
     if(!cFlagValuesRequest.length) {
         getLogs([commentsLog, 'Не было указано ни одного аргумента для списка городов, пожалуйста, впишите данные'])
         // это мы еще обсудим
-        process.kill(process.pid)
+        // process.kill(process.pid)
+        // проверять каждый элемент массива cFlagValuesRequest по отдельности
     } else if(/[0-9]/.test(cFlagValuesRequest)) {
         getLogs([commentsLog, 'В одном из аргументов для списка городов найдена цифра, пожалуйста, впишите валидные данные'])
-        process.kill(process.pid)
+        // process.kill(process.pid)
+        throw new Error('Ошибка! Вы лох')
     }
 }
 
 export function checkTempValid(tFlagValueRequest) {
     // из checkLangValid() мы всякое лишнее удалили. Надо сделать то же самое и здесь
     // + по хорошему удобно плясать от "шлем значение по умолчанию, если только не вставить_текст"
-    if (!tFlagValueRequest) {
-        getLogs([commentsLog, 'Не было передано аргумента для параметра tempOnly, значение автоматически выставлено на'], [falseLog, false], [falseLog, `\nfalse`])
-        return false
+    // if (!tFlagValueRequest) {
+    //     getLogs([commentsLog, 'Не было передано аргумента для параметра tempOnly, значение автоматически выставлено на'], [falseLog, false], [falseLog, `\nfalse`])
+    //     return false
+    // }
+    // getLogs([commentsLog, 'Переданный аргумент для параметра tempOnly:'], [requestPropertyLog, tFlagValueRequest])
+    // if(!((tFlagValueRequest === 'false') || (tFlagValueRequest === 'true'))) {
+    //     getLogs([commentsLog, 'Значение для параметра tempOnly не передано как'], [trueLog, 'true'], [commentsLog, 'или'], [falseLog, 'false,'], [commentsLog, 'значение автоматически выставлено на'], [falseLog, false], [falseLog, `\nfalse`])
+    //     return false
+    // }
+    // if(tFlagValueRequest === 'true') {
+    //     getLogs([trueLog, true])
+    //     return true
+    // }
+    // getLogs([falseLog, false])
+    // return false
+    if(tFlagValueRequest === 'false' || tFlagValueRequest === 'true') {
+        return tFlagValueRequest === 'true'
     }
-    getLogs([commentsLog, 'Переданный аргумент для параметра tempOnly:'], [requestPropertyLog, tFlagValueRequest])
-    if(!((tFlagValueRequest === 'false') || (tFlagValueRequest === 'true'))) {
-        getLogs([commentsLog, 'Значение для параметра tempOnly не передано как'], [trueLog, 'true'], [commentsLog, 'или'], [falseLog, 'false,'], [commentsLog, 'значение автоматически выставлено на'], [falseLog, false], [falseLog, `\nfalse`])
-        return false
-    } else if(tFlagValueRequest === 'true') {
-        getLogs([trueLog, true])
-        return true
-    } else {
-        getLogs([falseLog, false])
-        return false
-    }
+    getLogs([commentsLog, 'Значение для параметра tempOnly не было передано как'], [trueLog, 'true'], [commentsLog, 'или'], [falseLog, 'false'], [commentsLog, 'Значение автоматически выставленно на'], [falseLog, 'false'])
+    return false
 }
 
 export function checkLangValid(lFlagValueRequest) {

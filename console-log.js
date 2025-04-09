@@ -16,8 +16,6 @@ export const requestKeyLog = chalk.rgb(0, 229, 255)
 
 export const requestPropertyLog = chalk.rgb(149, 0, 255)
 
-// Это скорее не getLogs, а makeLogs / logEntry / createLogs 
-// а еще лучше printLogs
 export function getLogs(...logs) {
     //если передам что-то не то, все сломается. Раз у тебя такой прикольный варик с функция + текст,
     // то нужно валидировать входящие данные
@@ -27,6 +25,10 @@ export function getLogs(...logs) {
 
     //Можно было бы для удобства чтения записать это через деструктуризацию
     // console.log(logs.map(([logFunc, text]) => logFunc(text)).join(' '))
+}
+
+export function printLogs(...args) {
+    console.log(...args, '\n')
 }
 
 // Это идейно плохой подход. Мы передаем непонятную функцию, непонятные данные к ней
