@@ -1,6 +1,6 @@
 import {showWeather} from "./getweather.js"
 import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
-import {falseLog, getLogs, titleSectionLog, inputSectionLog, commentsLog, requestKeyLog, requestPropertyLog, printLogs} from "./console-log.js"
+import {falseLog, getLogs, titleSectionLog, inputSectionLog, commentsLog, requestKeyLog, requestPropertyLog, printLogs, Log} from "./console-log.js"
 
 function getFlagArguments(flagStartSymbol, inputArgs) {
     const resultFlagValue = []
@@ -20,8 +20,8 @@ async function main() {
     if(!args || !Array.isArray(args) || !args.length) return getLogs([commentsLog, '\nНе получили аргументы'])
     getLogs([inputSectionLog, `\nПолученные аргументы:`], [commentsLog, `\n${args}`])
     // Поменять все getLogs на printLogs
-    printLogs(inputSectionLog('Полученные аргументы:'), commentsLog(args))
-
+    Log.printLogs(inputSectionLog('Полученные аргументы:'), commentsLog(args))
+    
     const cFlagValues = getFlagArguments('-c', args)
     getLogs([inputSectionLog, 'Переданный список городов:']) + getLogs([commentsLog, cFlagValues])
     checkCitiesValid(cFlagValues)
@@ -29,6 +29,7 @@ async function main() {
     // пусть checkCitiesValid возвращает провалидированный список городов для cities
     const cities = cFlagValues
 
+    
     getLogs([titleSectionLog, '\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'])
 
     const tFlagValue = getFlagArguments('-t', args)[0]
