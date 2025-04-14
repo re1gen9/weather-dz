@@ -1,56 +1,38 @@
-import {falseLog, trueLog, getLogs, commentsLog, langKeyLog, requestPropertyLog} from "./console-log.js"
+import {Log} from "./console-log.js"
 import {WEATHER_LANG_OPTION} from "./config.js"
 
 export function checkCitiesValid(cFlagValuesRequest) {
     if(!cFlagValuesRequest.length) {
-        getLogs([commentsLog, 'Не было указано ни одного аргумента для списка городов, пожалуйста, впишите данные'])
-        // это мы еще обсудим
-        // process.kill(process.pid)
-        // проверять каждый элемент массива cFlagValuesRequest по отдельности
-    } else if(/[0-9]/.test(cFlagValuesRequest)) {
-        getLogs([commentsLog, 'В одном из аргументов для списка городов найдена цифра, пожалуйста, впишите валидные данные'])
-        // process.kill(process.pid)
-        throw new Error('Ошибка! Вы лох')
+        Log.printLogs(Log.commentsLog.bold('\nНе было указано ни одного аргумента для списка городов, пожалуйста, впишите данные'))
+        return null
     }
+    for(const element of cFlagValuesRequest) {
+        if(/[0-9]/.test(element)) {
+            Log.printLogs(Log.commentsLog.bold('\nВ одном из аргументов для списка городов найдена цифра, пожалуйста, впишите валидные данные'))
+            return null
+        }
+    }
+    return cFlagValuesRequest
 }
 
 export function checkTempValid(tFlagValueRequest) {
-    // из checkLangValid() мы всякое лишнее удалили. Надо сделать то же самое и здесь
-    // + по хорошему удобно плясать от "шлем значение по умолчанию, если только не вставить_текст"
-    // if (!tFlagValueRequest) {
-    //     getLogs([commentsLog, 'Не было передано аргумента для параметра tempOnly, значение автоматически выставлено на'], [falseLog, false], [falseLog, `\nfalse`])
-    //     return false
-    // }
-    // getLogs([commentsLog, 'Переданный аргумент для параметра tempOnly:'], [requestPropertyLog, tFlagValueRequest])
-    // if(!((tFlagValueRequest === 'false') || (tFlagValueRequest === 'true'))) {
-    //     getLogs([commentsLog, 'Значение для параметра tempOnly не передано как'], [trueLog, 'true'], [commentsLog, 'или'], [falseLog, 'false,'], [commentsLog, 'значение автоматически выставлено на'], [falseLog, false], [falseLog, `\nfalse`])
-    //     return false
-    // }
-    // if(tFlagValueRequest === 'true') {
-    //     getLogs([trueLog, true])
-    //     return true
-    // }
-    // getLogs([falseLog, false])
-    // return false
-    if(tFlagValueRequest === 'false' || tFlagValueRequest === 'true') {
-        return tFlagValueRequest === 'true'
+    if(tFlagValueRequest === 'true') {
+        Log.printLogs(Log.commentsLog('Переданный аргумент для параметра tempOnly:'), Log.trueLog(true))
+        return true
     }
-    getLogs([commentsLog, 'Значение для параметра tempOnly не было передано как'], [trueLog, 'true'], [commentsLog, 'или'], [falseLog, 'false'], [commentsLog, 'Значение автоматически выставленно на'], [falseLog, 'false'])
+    if(tFlagValueRequest === 'false') {
+        Log.printLogs(Log.commentsLog('Переданный аргумент для параметра tempOnly:'), Log.falseLog(false))
+        return false
+    }
+    Log.printLogs(Log.commentsLog('Значение для параметра tempOnly не было передано как'), Log.trueLog('true'), Log.commentsLog('или'), Log.falseLog('false'), Log.requestPropertyLog(' >>> '), Log.commentsLog('значение автоматически выставленно на'), Log.falseLog('false'))
     return false
 }
 
 export function checkLangValid(lFlagValueRequest) {
-    if(!lFlagValueRequest) {
-        getLogs([commentsLog, 'Не было передано аргумента для параметра lang, значение автоматически выставлено на'], [trueLog, WEATHER_LANG_OPTION.RU])
-        getLogs([trueLog, WEATHER_LANG_OPTION.RU])
-        return WEATHER_LANG_OPTION.RU
-    }
-    getLogs([commentsLog, 'Переданный аргумент для параметра lang:'], [langKeyLog, lFlagValueRequest])
     if(!(Object.values(WEATHER_LANG_OPTION).includes(lFlagValueRequest))) {
-        getLogs([commentsLog, 'Переданный аргумент для параметра lang не является одним из доступных вариантов, значение автоматически выставлено на'], [trueLog, WEATHER_LANG_OPTION.RU])
-        getLogs([trueLog, WEATHER_LANG_OPTION.RU])
+        Log.printLogs(Log.commentsLog('Значение для параметра lang не было передано как один из доступных вариантов'), Log.requestPropertyLog(' >>> '), Log.commentsLog('значение автоматически выставлено на'), Log.langKeyLog(WEATHER_LANG_OPTION.RU))
         return WEATHER_LANG_OPTION.RU
     }
-    getLogs([trueLog, lFlagValueRequest])
+    Log.printLogs(Log.commentsLog('Переданный аргумент для параметра lang:'), Log.langKeyLog(lFlagValueRequest))
     return lFlagValueRequest
 }

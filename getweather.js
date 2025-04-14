@@ -1,11 +1,13 @@
 import axios from "axios"
 import {WEATHER_API_URL, WEATHER_API_APP_ID} from "./config.js"
-import {GetWeatherLogs} from "./console-log.js"
+import {Log} from "./console-log.js"
 
 export async function showWeather(dataForSearch) {
-    // здесь мы должны получать данные от getWeather
-    // и тут выводить результат в консоль по нужному типу
-    return GetWeatherLogs(getWeather, dataForSearch)
+    const response = await getWeather(dataForSearch.city, dataForSearch.lang)
+    if(dataForSearch.tempOnly === true) {
+        return Log.printLogs(Log.trueLog(response?.main?.temp))
+    }
+    return Log.printLogs(response)
 }
 
 async function getWeather(city, lang) {
@@ -17,7 +19,5 @@ async function getWeather(city, lang) {
     }
     return axios.get(WEATHER_API_URL, {
         params
-        // обсудим catch
-        // (хотя на слое выше он используется)
       }).then((res) => res.data)
     }

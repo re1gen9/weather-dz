@@ -1,6 +1,6 @@
 import {showWeather} from "./getweather.js"
 import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
-import {falseLog, getLogs, titleSectionLog, inputSectionLog, commentsLog, requestKeyLog, requestPropertyLog, printLogs, Log} from "./console-log.js"
+import {Log} from "./console-log.js"
 
 function getFlagArguments(flagStartSymbol, inputArgs) {
     const resultFlagValue = []
@@ -17,30 +17,25 @@ function getFlagArguments(flagStartSymbol, inputArgs) {
 
 async function main() {
     const [,, ...args] = process.argv
-    if(!args || !Array.isArray(args) || !args.length) return getLogs([commentsLog, '\nНе получили аргументы'])
-    getLogs([inputSectionLog, `\nПолученные аргументы:`], [commentsLog, `\n${args}`])
-    // Поменять все getLogs на printLogs
-    Log.printLogs(inputSectionLog('Полученные аргументы:'), commentsLog(args))
-    
-    const cFlagValues = getFlagArguments('-c', args)
-    getLogs([inputSectionLog, 'Переданный список городов:']) + getLogs([commentsLog, cFlagValues])
-    checkCitiesValid(cFlagValues)
-    // зачем нужно это переприсвоение?
-    // пусть checkCitiesValid возвращает провалидированный список городов для cities
-    const cities = cFlagValues
+    if(!args || !Array.isArray(args) || !args.length) return Log.printLogs(Log.commentsLog('Не получили аргументы'))
+    Log.printLogs(Log.inputSectionLog('Полученные аргументы:'), Log.commentsLog(args))
 
-    
-    getLogs([titleSectionLog, '\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'])
+    const cFlagValues = getFlagArguments('-c', args)
+    Log.printLogs(Log.inputSectionLog('Переданный список городов:'), Log.commentsLog(cFlagValues))
+    const cities = checkCitiesValid(cFlagValues)
+    if(cities === null) return
+
+    Log.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'))
 
     const tFlagValue = getFlagArguments('-t', args)[0]
     const tempOnlyStatus = checkTempValid(tFlagValue)
 
-    getLogs([titleSectionLog, '\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'])
+    Log.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'))
 
     const lFlagValue = getFlagArguments('-l', args)[0]
     const langStatus = checkLangValid(lFlagValue)
 
-    getLogs([titleSectionLog, '\n<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->'])
+    Log.printLogs(Log.titleSectionLog('\n<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->'))
 
     for(const city of cities) {
         const cityData = {
@@ -48,34 +43,20 @@ async function main() {
             tempOnly: tempOnlyStatus,
             lang: langStatus
         }
-        getLogs([falseLog, '\n< --- Отправляем запрос со следующими параметрами --- >\n'])
+        Log.printLogs(Log.sendRequestLog('\nОтправляем запрос со следующими параметрами:\n'))
 
-        getLogs([requestKeyLog, 'Город:'], [requestPropertyLog, `${cityData.city}`])
-        getLogs([requestKeyLog, 'Значение для tempOnly:'], [requestPropertyLog, `${cityData.tempOnly}`])
-        getLogs([requestKeyLog, 'Язык:'], [requestPropertyLog, `${cityData.lang}\n`])
+        Log.printLogs(Log.requestKeyLog('Город:'), Log.requestPropertyLog(cityData.city))
+        Log.printLogs(Log.requestKeyLog('Значение для tempOnly:'), Log.requestPropertyLog(cityData.tempOnly))
+        Log.printLogs(Log.requestKeyLog('Язык:'), Log.requestPropertyLog(cityData.lang))
           
         try {
             await showWeather(cityData)
         } catch(error) {
-            getLogs([falseLog, '< --- Произошла ошибка, информация по городу не была найдена --- >\n'])
-            getLogs([requestKeyLog, 'Код ошибки:'], [falseLog, error.response.data.cod])
-            getLogs([requestKeyLog, 'Полученное сообщение:'], [requestPropertyLog, `${error.response.data.message}\n`])
+            Log.printLogs(Log.commentsLog.bold('\n^^^ Произошла ошибка, информация по городу не была найдена\n'))
+            Log.printLogs(Log.commentsLog.bold('Код ошибки:'), Log.falseLog(error.response.data.cod))
+            Log.printLogs(Log.commentsLog.bold('Полученное сообщение:'), Log.falseLog(error.response.data.message))
         }
     }
 }
-
-/**
- * У тебя вылезают ненужные дублирующие логи
- * 
- * <---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->
-
-Переданный аргумент для параметра tempOnly: true
-true
-
-<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->
-
-Не было передано аргумента для параметра lang, значение автоматически выставлено на ru
-ru
- */
 
 main()
