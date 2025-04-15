@@ -15,12 +15,34 @@ function getFlagArguments(flagStartSymbol, inputArgs) {
     return resultFlagValue
 }
 
+function getCitiesArray(cFlagValuesRequest) {
+    const citiesArr = []
+    let citiesString = ''
+    for(let i = 0; i < cFlagValuesRequest.length + 2; i++) {
+        if(!(cFlagValuesRequest[i] === ']') && !(cFlagValuesRequest[i] === '[')) {
+            if(citiesString === ''){
+                citiesString = `${citiesString + cFlagValuesRequest[i]}`
+            } else {
+                citiesString = `${citiesString + ' ' + cFlagValuesRequest[i]}`
+            }
+        }
+        if(cFlagValuesRequest[i] === '[' || i === cFlagValuesRequest.length - 1) {
+            citiesArr.push(citiesString)
+            citiesString = ''
+            continue
+        }
+        if(i === cFlagValuesRequest.length + 1) {
+            return citiesArr
+        }
+    }
+}
+
 async function main() {
     const [,, ...args] = process.argv
     if(!args || !Array.isArray(args) || !args.length) return Log.printLogs(Log.commentsLog('Не получили аргументы'))
     Log.printLogs(Log.inputSectionLog('Полученные аргументы:'), Log.commentsLog(args))
 
-    const cFlagValues = getFlagArguments('-c', args)
+    const cFlagValues = getCitiesArray(getFlagArguments('-c', args))
     Log.printLogs(Log.inputSectionLog('Переданный список городов:'), Log.commentsLog(cFlagValues))
     const cities = checkCitiesValid(cFlagValues)
     if(cities === null) return
