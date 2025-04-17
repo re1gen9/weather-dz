@@ -1,6 +1,8 @@
 import {showWeather} from "./getweather.js"
 import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
-import {Log} from "./console-log.js"
+import {Log, Logger} from "./console-log.js"
+
+const logger = new Logger('MAIN')
 
 function getFlagArguments(flagStartSymbol, inputArgs) {
     const resultFlagValue = []
@@ -39,25 +41,25 @@ function getCitiesArray(cFlagValuesRequest) {
 
 async function main() {
     const [,, ...args] = process.argv
-    if(!args || !Array.isArray(args) || !args.length) return Log.printLogs(Log.commentsLog('Не получили аргументы'))
-    Log.printLogs(Log.inputSectionLog('Полученные аргументы:'), Log.commentsLog(args))
+    if(!args || !Array.isArray(args) || !args.length) return logger.printLogs(Log.commentsLog('Не получили аргументы'))
+    logger.printLogs(Log.inputSectionLog('Полученные аргументы:'), Log.commentsLog(args))
 
     const cFlagValues = getCitiesArray(getFlagArguments('-c', args))
-    Log.printLogs(Log.inputSectionLog('Переданный список городов:'), Log.commentsLog(cFlagValues))
+    logger.printLogs(Log.inputSectionLog('Переданный список городов:'), Log.commentsLog(cFlagValues))
     const cities = checkCitiesValid(cFlagValues)
     if(cities === null) return
 
-    Log.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'))
+    logger.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'))
 
     const tFlagValue = getFlagArguments('-t', args)[0]
     const tempOnlyStatus = checkTempValid(tFlagValue)
 
-    Log.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'))
+    logger.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'))
 
     const lFlagValue = getFlagArguments('-l', args)[0]
     const langStatus = checkLangValid(lFlagValue)
 
-    Log.printLogs(Log.titleSectionLog('\n<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->'))
+    logger.printLogs(Log.titleSectionLog('<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->\n'))
 
     for(const city of cities) {
         const cityData = {
@@ -65,20 +67,34 @@ async function main() {
             tempOnly: tempOnlyStatus,
             lang: langStatus
         }
-        Log.printLogs(Log.sendRequestLog('\nОтправляем запрос со следующими параметрами:\n'))
+        logger.printLogs(Log.sendRequestLog('\nОтправляем запрос со следующими параметрами:\n'))
 
-        Log.printLogs(Log.requestKeyLog('Город:'), Log.requestPropertyLog(cityData.city))
-        Log.printLogs(Log.requestKeyLog('Значение для tempOnly:'), Log.requestPropertyLog(cityData.tempOnly))
-        Log.printLogs(Log.requestKeyLog('Язык:'), Log.requestPropertyLog(cityData.lang))
+        logger.printLogs(Log.requestKeyLog('Город:'), Log.requestPropertyLog(cityData.city))
+        logger.printLogs(Log.requestKeyLog('Значение для tempOnly:'), Log.requestPropertyLog(cityData.tempOnly))
+        logger.printLogs(Log.requestKeyLog('Язык:'), Log.requestPropertyLog(cityData.lang))
           
         try {
             await showWeather(cityData)
         } catch(error) {
-            Log.printLogs(Log.commentsLog.bold('\n^^^ Произошла ошибка, информация по городу не была найдена\n'))
-            Log.printLogs(Log.commentsLog.bold('Код ошибки:'), Log.falseLog(error.response.data.cod))
-            Log.printLogs(Log.commentsLog.bold('Полученное сообщение:'), Log.falseLog(error.response.data.message))
+            logger.printLogs(Log.commentsLog.bold('^^^ Произошла ошибка, информация по городу не была найдена\n'))
+            logger.printLogs(Log.commentsLog.bold('Код ошибки:'), Log.falseLog(error.response?.data?.cod))
+            logger.printLogs(Log.commentsLog.bold('Полученное сообщение:'), Log.falseLog(error.response?.data?.message))
         }
     }
 }
 
 main()
+
+
+
+// Так, берем `response` у `error`. А у `response` берем `data`. А у `data` берем `code`
+// error.response.data.code
+
+// Так, а проверь, есть ли `response` у `error`? 
+// Если нет, значит возвращаем `undefined`
+// Если есть,  то идем дальше по "цепочке" (если есть куда)
+// Далее: а проверь, есть ли `data` у `response`? 
+// ...
+// Далее: а проверь, есть ли `code` у `data`? 
+// Если хоть где-то у нас не будет нужного свойства, то все это просто вернет `undefined`
+// error?.response?.data?.code
