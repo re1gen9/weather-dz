@@ -1,6 +1,7 @@
+import inquirer from 'inquirer'
 import {showWeather} from "./getweather.js"
 import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
-import {Log, Logger} from "./console-log.js"
+import {Logger} from "./console-log.js"
 
 const logger = new Logger('MAIN')
 
@@ -14,26 +15,30 @@ function getFlagArguments(flagStartSymbol, inputArgs) {
             }
         }
     }
+    if(!resultFlagValue.length) return [null]
     return resultFlagValue
 }
 
-function getCitiesArray(cFlagValuesRequest) {
+function getCitiesArray(cValuesRequest) {
+    if (cValuesRequest[0] === null) return cValuesRequest
+    let citiesValues = cValuesRequest
+    if(typeof citiesValues === 'string') citiesValues = cValuesRequest.split(' ')
     const citiesArr = []
     let citiesString = ''
-    for(let i = 0; i < cFlagValuesRequest.length + 2; i++) {
-        if(!(cFlagValuesRequest[i] === ']') && !(cFlagValuesRequest[i] === '[')) {
+    for(let i = 0; i < citiesValues.length + 2; i++) {
+        if(!(citiesValues[i] === '[')) {
             if(citiesString === ''){
-                citiesString = `${citiesString + cFlagValuesRequest[i]}`
+                citiesString = `${citiesString + citiesValues[i]}`
             } else {
-                citiesString = `${citiesString + ' ' + cFlagValuesRequest[i]}`
+                citiesString = `${citiesString + ' ' + citiesValues[i]}`
             }
         }
-        if(cFlagValuesRequest[i] === '[' || i === cFlagValuesRequest.length - 1) {
+        if(citiesValues[i] === '[' || i === citiesValues.length - 1) {
             citiesArr.push(citiesString)
             citiesString = ''
             continue
         }
-        if(i === cFlagValuesRequest.length + 1) {
+        if(i === citiesValues.length + 1) {
             return citiesArr
         }
     }
@@ -41,25 +46,77 @@ function getCitiesArray(cFlagValuesRequest) {
 
 async function main() {
     const [,, ...args] = process.argv
-    if(!args || !Array.isArray(args) || !args.length) return logger.printLogs(Log.commentsLog('Не получили аргументы'))
-    logger.printLogs(Log.inputSectionLog('Полученные аргументы:'), Log.commentsLog(args))
+    let tempOnlyStatus
+    let langStatus
+    let cities
 
-    const cFlagValues = getCitiesArray(getFlagArguments('-c', args))
-    logger.printLogs(Log.inputSectionLog('Переданный список городов:'), Log.commentsLog(cFlagValues))
-    const cities = checkCitiesValid(cFlagValues)
-    if(cities === null) return
+    if(!args.length) {
+        const cityQuestion = await inquirer.prompt([
+            {
+            type: 'input',
+            name: 'cities',
+            message: 'Вы не указали города для поиска. Пожалуйста, впишите значения. Для указания нескольких городов используйте знак [ для разделения\n',
+            }
+        ]).then(answer => {
+            console.log()
+            if(!answer.cities) {
+            return [null]
+            }
+            return answer.cities
+        })
 
-    logger.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'))
+        const tempOnlyQuestion = await inquirer.prompt([
+            {
+            type: 'list',
+            name: 'tempOnly',
+            message: 'Выберите значение для параметра tempOnly',
+            choices: ['true', 'false']
+            }
+        ]).then(answer => {
+            console.log()
+            return [answer.tempOnly]
+        })
 
-    const tFlagValue = getFlagArguments('-t', args)[0]
-    const tempOnlyStatus = checkTempValid(tFlagValue)
+        const langQuestion = await inquirer.prompt([
+            {
+            type: 'list',
+            name: 'lang',
+            message: 'Выберите язык',
+            choices: ['ru', 'en', 'de']
+            }
+        ]).then(answer => {
+            console.log()
+            return [answer.lang]
+        })
 
-    logger.printLogs(Log.titleSectionLog('\n<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'))
+        const questionCValues = getCitiesArray(cityQuestion)
+        cities = checkCitiesValid(questionCValues)
+        if(cities === null) return
+        logger.printLogs(logger.inputSectionLog('Переданный список городов:'), logger.commentsLog(questionCValues), '\n')
 
-    const lFlagValue = getFlagArguments('-l', args)[0]
-    const langStatus = checkLangValid(lFlagValue)
+        tempOnlyStatus = checkTempValid(tempOnlyQuestion)
+        langStatus = checkLangValid(langQuestion)
+    } else {
+        const cFlagValues = getCitiesArray(getFlagArguments('-c', args))
+        cities = checkCitiesValid(cFlagValues)
+        if(cities === null) return
 
-    logger.printLogs(Log.titleSectionLog('<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->\n'))
+        logger.printLogs(logger.inputSectionLog('Полученные аргументы:'), logger.commentsLog(args))
+
+        logger.printLogs(logger.inputSectionLog('Переданный список городов:'), logger.commentsLog(cFlagValues), '\n')
+
+        logger.printLogs(logger.titleSectionLog('<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА tempOnly ---------->\n'))
+
+        const tFlagValue = getFlagArguments('-t', args)
+        tempOnlyStatus = checkTempValid(tFlagValue)
+
+        logger.printLogs(logger.titleSectionLog('<---------- ЛОГИРОВАНИЕ И ПРОВЕРКА ВАЛИДНОСТИ АРГУМЕНТА lang ---------->\n'))
+
+        const lFlagValue = getFlagArguments('-l', args)
+        langStatus = checkLangValid(lFlagValue)
+    }
+
+    logger.printLogs(logger.titleSectionLog('<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->\n'))
 
     for(const city of cities) {
         const cityData = {
@@ -67,18 +124,18 @@ async function main() {
             tempOnly: tempOnlyStatus,
             lang: langStatus
         }
-        logger.printLogs(Log.sendRequestLog('\nОтправляем запрос со следующими параметрами:\n'))
+        logger.printLogs(logger.sendRequestLog('Отправляем запрос со следующими параметрами:\n'))
 
-        logger.printLogs(Log.requestKeyLog('Город:'), Log.requestPropertyLog(cityData.city))
-        logger.printLogs(Log.requestKeyLog('Значение для tempOnly:'), Log.requestPropertyLog(cityData.tempOnly))
-        logger.printLogs(Log.requestKeyLog('Язык:'), Log.requestPropertyLog(cityData.lang))
+        logger.printLogs(logger.requestKeyLog('Город:'), logger.requestPropertyLog(cityData.city))
+        logger.printLogs(logger.requestKeyLog('Значение для tempOnly:'), logger.requestPropertyLog(cityData.tempOnly))
+        logger.printLogs(logger.requestKeyLog('Язык:'), logger.requestPropertyLog(cityData.lang), '\n')
           
         try {
-            await showWeather(cityData)
+            await showWeather(cityData), console.log()
         } catch(error) {
-            logger.printLogs(Log.commentsLog.bold('^^^ Произошла ошибка, информация по городу не была найдена\n'))
-            logger.printLogs(Log.commentsLog.bold('Код ошибки:'), Log.falseLog(error.response?.data?.cod))
-            logger.printLogs(Log.commentsLog.bold('Полученное сообщение:'), Log.falseLog(error.response?.data?.message))
+            logger.printLogs(logger.commentsLog.bold('^^^ Произошла ошибка, информация по городу не была найдена'))
+            logger.printLogs(logger.commentsLog.bold('Код ошибки:'), logger.falseLog(error.response?.data?.cod))
+            logger.printLogs(logger.commentsLog.bold('Полученное сообщение:'), logger.falseLog(error.response?.data?.message), '\n')
         }
     }
 }
