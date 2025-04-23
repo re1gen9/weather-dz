@@ -1,8 +1,10 @@
 {
+  "name": "weather-cli-app",
+  "version": "0.0.1",
   "type": "module",
   "dependencies": {
     "axios": "^1.8.4",
     "chalk": "^5.4.1",
-    "openai": "^4.91.1"
+    "inquirer": "^12.5.2"
   }
 }

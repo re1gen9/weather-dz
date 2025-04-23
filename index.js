@@ -1,7 +1,9 @@
 import inquirer from 'inquirer'
 import {showWeather} from "./getweather.js"
+import {WEATHER_LANG_OPTION} from "./config.js"
 import {checkCitiesValid, checkTempValid, checkLangValid} from "./validation.js"
 import {Logger} from "./console-log.js"
+// import { getArguments } from './parse-args.js'
 
 const logger = new Logger('MAIN')
 
@@ -19,6 +21,7 @@ function getFlagArguments(flagStartSymbol, inputArgs) {
     return resultFlagValue
 }
 
+// Надо переделать, на более простой линейный варик. Попробуй с ',' как разделитель
 function getCitiesArray(cValuesRequest) {
     if (cValuesRequest[0] === null) return cValuesRequest
     let citiesValues = cValuesRequest
@@ -64,6 +67,7 @@ async function main() {
             }
             return answer.cities
         })
+        console.log('cityQuestion', cityQuestion)
 
         const tempOnlyQuestion = await inquirer.prompt([
             {
@@ -82,7 +86,7 @@ async function main() {
             type: 'list',
             name: 'lang',
             message: 'Выберите язык',
-            choices: ['ru', 'en', 'de']
+            choices: Object.values(WEATHER_LANG_OPTION)
             }
         ]).then(answer => {
             console.log()
@@ -116,6 +120,11 @@ async function main() {
         langStatus = checkLangValid(lFlagValue)
     }
 
+    /** Некая функция getArguments, которая получает аргументы, переданные при запуске нашего приложения
+     * И далее внутри ДЕЛАЕТ КАКУЮ-ТО МАГИЮ (и нам не важно какую именно), в результе которой
+     * мы получае ТОЧНО валидные параметры для отправке запроса */ 
+    // const {cities, langStatus, tempOnlyStatus} = getArguments(args);
+
     logger.printLogs(logger.titleSectionLog('<---------- ОТПРАВКА ЗАПРОСА И ПОЛУЧЕНИЕ ОБЪЕКТА ПОГОДЫ ---------->\n'))
 
     for(const city of cities) {
@@ -141,17 +150,3 @@ async function main() {
 }
 
 main()
-
-
-
-// Так, берем `response` у `error`. А у `response` берем `data`. А у `data` берем `code`
-// error.response.data.code
-
-// Так, а проверь, есть ли `response` у `error`? 
-// Если нет, значит возвращаем `undefined`
-// Если есть,  то идем дальше по "цепочке" (если есть куда)
-// Далее: а проверь, есть ли `data` у `response`? 
-// ...
-// Далее: а проверь, есть ли `code` у `data`? 
-// Если хоть где-то у нас не будет нужного свойства, то все это просто вернет `undefined`
-// error?.response?.data?.code
