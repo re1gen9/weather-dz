@@ -4,5 +4,6 @@ export const WEATHER_LANG_OPTION = {
     RU: 'ru',
     EN: 'en',
     DE: 'de',
-    ES: 'es'
+    ES: 'es',
 }
+export const SHOW_WEATHER_INTERVAL_SECS = 10 * 1000

@@ -1,20 +1,22 @@
-import { WEATHER_LANG_OPTION } from "./config";
-import { checkCitiesValid, checkLangValid, checkTempValid } from "./validation";
+import { WEATHER_LANG_OPTION } from './config'
+import { checkCitiesValid, checkLangValid, checkTempValid } from './validation'
 
 export function getArguments(args) {
-    const {cities, tempOnlyStatus, langStatus} = args.length
+    const { cities, tempOnlyStatus, langStatus } = args.length
         ? parseProccesArgs(args)
         : getUserPrompt()
 
-     return   {
-        cities: checkCitiesValid(cities), 
-        tempOnlyStatus: checkTempValid(tempOnlyStatus), 
-        langStatus: checkLangValid(langStatus)
+    return {
+        cities: checkCitiesValid(cities),
+        tempOnlyStatus: checkTempValid(tempOnlyStatus),
+        langStatus: checkLangValid(langStatus),
     }
 }
 
 function getUserPrompt() {
-    let cities = ['someCities'], langStatus = WEATHER_LANG_OPTION.EN, tempOnlyStatus = true;
+    let cities = ['someCities'],
+        langStatus = WEATHER_LANG_OPTION.EN,
+        tempOnlyStatus = true
 
     // Тут какая-то очень умная логика
 
@@ -68,7 +70,9 @@ function getUserPrompt() {
 }
 
 function parseProccesArgs() {
-    let cities = ['someCities'], langStatus = WEATHER_LANG_OPTION.EN, tempOnlyStatus = true;
+    let cities = ['someCities'],
+        langStatus = WEATHER_LANG_OPTION.EN,
+        tempOnlyStatus = true
 
     //     const cFlagValues = getCitiesArray(getFlagArguments('-c', args))
     //     cities = checkCitiesValid(cFlagValues)
@@ -91,33 +95,32 @@ function parseProccesArgs() {
     return { cities, langStatus, tempOnlyStatus }
 }
 
+// // <-------------------------- МИНИ ЛЕКЦИЯ ----------------------------------------->
+// function getUserName(id) {
+//     // ...
+//     return 'Rustam'
+// }
+// const active = true;
 
-// <-------------------------- МИНИ ЛЕКЦИЯ ----------------------------------------->
-function getUserName(id) {
-    // ...
-    return 'Rustam'
-}
-const active = true;
+// const name = getUserName(123)
+// //Это тернарный оператор
+// const rustamUser = name === 'Rustam' ? 'Rustamchik' : 'Lol'
 
-const name = getUserName(123)
-//Это тернарный оператор
-const rustamUser = name === 'Rustam' ? 'Rustamchik' : 'Lol'
+// // По сути мы делаем вот это (то шо ниже), только короче записано
+// let newRustmaUser;
+// if (name === 'Rustam') {
+//     newRustmaUser = 'Rustamchik'
+// } else {
+//     newRustmaUser = 'Lol'
+// }
 
-// По сути мы делаем вот это (то шо ниже), только короче записано
-let newRustmaUser;
-if (name === 'Rustam') {
-    newRustmaUser = 'Rustamchik'
-} else {
-    newRustmaUser = 'Lol'
-}
+// // &&
+// if(name === 'Rustam' && active) { /** МЫ СЮДА ЗАЙДЕМ ТОЛЬКО ЕСЛИ ОБА ТРУ */}
+// // ||
+// if(name === 'Rustam' || active) { /** МЫ СЮДА ЗАЙДЕМ ЕСЛИ ХОТЯ БЫ ОДИН ИЗ НИХ ТРУ */}
+// // ??
+// const userName = newRustmaUser ?? 'No name' /** Мы положим в `userName` значение 'No name', только если
+// newRustmaUser === null или newRustmaUser === undefined
 
-// &&
-if(name === 'Rustam' && active) { /** МЫ СЮДА ЗАЙДЕМ ТОЛЬКО ЕСЛИ ОБА ТРУ */}
-// ||
-if(name === 'Rustam' || active) { /** МЫ СЮДА ЗАЙДЕМ ЕСЛИ ХОТЯ БЫ ОДИН ИЗ НИХ ТРУ */}
-// ??
-const userName = newRustmaUser ?? 'No name' /** Мы положим в `userName` значение 'No name', только если 
-newRustmaUser === null или newRustmaUser === undefined 
-
-Если newRustmaUser, например, === false, то мы и положим в userName false
-*/
+// Если newRustmaUser, например, === false, то мы и положим в userName false
+// */

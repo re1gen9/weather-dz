@@ -4,7 +4,7 @@ export class Logger {
     constructor(scope) {
         this.scope = scope
     }
-    
+
     falseLog = chalk.red.bold
     trueLog = chalk.green.bold
     inputSectionLog = chalk.rgb(185, 255, 33)
